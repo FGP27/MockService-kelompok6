@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShopSaga — E-Commerce</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
 :root {
   --bg: #0b1120;
@@ -659,11 +660,11 @@ nav {
   <div class="nav-links">
     <button class="active" onclick="showView('store')">Store</button>
     <button class="cart-btn" onclick="toggleCart()">
-      🛒 Cart
+      <i class="fas fa-cart-shopping"></i> Cart
       <span class="cart-badge" id="cartBadge">0</span>
     </button>
     <div id="authNavContainer">
-      <button id="btnShowLogin" onclick="showView('auth')" style="margin-left:4px;">🔑 Login</button>
+      <button id="btnShowLogin" onclick="showView('auth')" style="margin-left:4px;"><i class="fas fa-key"></i> Login</button>
       <div id="authUserInfo" class="auth-user" style="display:none;margin-left:8px;">
         <div class="avatar" id="userAvatar">A</div>
         <div class="info">
@@ -686,10 +687,10 @@ nav {
         <h1>Welcome to <span>ShopSaga</span></h1>
         <p>Your one-stop shop for quality products. Every order is processed through our distributed transaction system to ensure reliability.</p>
         <div class="hero-badges">
-          <span>🔒 Secure Payment</span>
-          <span>🚚 Fast Shipping</span>
-          <span>✅ 100% Authentic</span>
-          <span>↩️ Easy Returns</span>
+          <span><i class="fas fa-lock"></i> Secure Payment</span>
+          <span><i class="fas fa-truck"></i> Fast Shipping</span>
+          <span><i class="fas fa-check-circle"></i> 100% Authentic</span>
+          <span><i class="fas fa-undo"></i> Easy Returns</span>
         </div>
       </div>
       <div class="section-title">
@@ -707,10 +708,10 @@ nav {
   <!-- ==================== VIEW: CHECKOUT ==================== -->
   <section class="view" id="view-checkout">
     <div class="container">
-      <button class="back-btn" onclick="showView('store')">← Back to Store</button>
+      <button class="back-btn" onclick="showView('store')"><i class="fas fa-arrow-left"></i> Back to Store</button>
       <div class="checkout-layout">
         <div class="checkout-form">
-          <h2>📝 Checkout</h2>
+          <h2><i class="fas fa-pen"></i> Checkout</h2>
           <div class="form-group">
             <label>Customer Name</label>
             <input type="text" id="customerName" placeholder="Full name">
@@ -747,25 +748,25 @@ nav {
           </div>
 
           <div class="error-section">
-            <div class="label">🧪 Simulation Error (for testing saga rollback)</div>
+            <div class="label"><i class="fas fa-flask"></i> Simulation Error (for testing saga rollback)</div>
             <div class="error-toggle" id="errorToggle">
-              <button class="active-none" data-fail="" onclick="setFail(this)">✅ None</button>
-              <button data-fail="step1" onclick="setFail(this)">💳 Step 1</button>
-              <button data-fail="step2" onclick="setFail(this)">📦 Step 2</button>
-              <button data-fail="step3" onclick="setFail(this)">🚚 Step 3</button>
+              <button class="active-none" data-fail="" onclick="setFail(this)"><i class="fas fa-check-circle"></i> None</button>
+              <button data-fail="step1" onclick="setFail(this)"><i class="fas fa-credit-card"></i> Step 1</button>
+              <button data-fail="step2" onclick="setFail(this)"><i class="fas fa-box"></i> Step 2</button>
+              <button data-fail="step3" onclick="setFail(this)"><i class="fas fa-truck"></i> Step 3</button>
             </div>
           </div>
         </div>
 
         <div class="checkout-summary" id="checkoutSummary">
-          <h3>🛒 Order Summary</h3>
+          <h3><i class="fas fa-cart-shopping"></i> Order Summary</h3>
           <div class="csum-items" id="csumItems"></div>
           <div class="csum-total">
             <span>Total</span>
             <span class="amount" id="csumTotal">Rp 0</span>
           </div>
           <button class="btn-place-order" id="btnPlaceOrder" onclick="placeOrder()">
-            🔄 Place Order
+            <i class="fas fa-sync-alt"></i> Place Order
           </button>
         </div>
       </div>
@@ -777,33 +778,33 @@ nav {
     <div class="container">
       <div class="processing-wrapper">
         <div class="processing-header">
-          <h2>⏳ Processing Your Order</h2>
+          <h2><i class="fas fa-hourglass-half"></i> Processing Your Order</h2>
           <p id="processingStatus">Executing distributed transaction...</p>
         </div>
         <div class="flow" id="flow">
           <div class="step-box idle" id="step1Box">
-            <div class="icon">💳</div>
+            <div class="icon"><i class="fas fa-credit-card"></i></div>
             <div class="label">Payment</div>
             <div class="sub">Step 1</div>
-            <div class="badge">⏳ Waiting</div>
+            <div class="badge"><i class="fas fa-hourglass-half"></i> Waiting</div>
           </div>
-          <div class="arrow" id="arrow1">➡️</div>
+          <div class="arrow" id="arrow1"><i class="fas fa-arrow-right"></i></div>
           <div class="step-box idle" id="step2Box">
-            <div class="icon">📦</div>
+            <div class="icon"><i class="fas fa-box"></i></div>
             <div class="label">Inventory</div>
             <div class="sub">Step 2</div>
-            <div class="badge">⏳ Waiting</div>
+            <div class="badge"><i class="fas fa-hourglass-half"></i> Waiting</div>
           </div>
-          <div class="arrow" id="arrow2">➡️</div>
+          <div class="arrow" id="arrow2"><i class="fas fa-arrow-right"></i></div>
           <div class="step-box idle" id="step3Box">
-            <div class="icon">🚚</div>
+            <div class="icon"><i class="fas fa-truck"></i></div>
             <div class="label">Shipping</div>
             <div class="sub">Step 3</div>
-            <div class="badge">⏳ Waiting</div>
+            <div class="badge"><i class="fas fa-hourglass-half"></i> Waiting</div>
           </div>
         </div>
         <div class="rollback-path" id="rollbackPath">
-          ↩️ Rollback: Membatalkan transaksi secara berurutan
+          <i class="fas fa-undo"></i> Rollback: Membatalkan transaksi secara berurutan
         </div>
         <div style="text-align:center;margin-top:20px;color:var(--muted2);font-size:13px;">
           <span class="spinner"></span> Please wait while we process your order...
@@ -817,7 +818,7 @@ nav {
     <div class="container">
       <div class="auth-wrapper">
         <div class="auth-card">
-          <h2>🔐 Welcome</h2>
+          <h2><i class="fas fa-lock"></i> Welcome</h2>
           <p class="sub">Login or create an account to continue</p>
           <div class="auth-tabs">
             <button class="active" data-authtab="login" onclick="switchAuthTab('login')">Login</button>
@@ -870,12 +871,12 @@ nav {
     <div class="container">
       <div class="result-wrapper">
         <div class="result-header-card" id="resultHeaderCard">
-          <div class="result-icon" id="resultIcon">✅</div>
+          <div class="result-icon" id="resultIcon"><i class="fas fa-check-circle"></i></div>
           <div class="result-title" id="resultTitle">Order Successful!</div>
           <div class="result-subtitle" id="resultSubtitle">Your order has been placed successfully.</div>
         </div>
         <div class="result-order-summary" id="resultOrderSummary">
-          <h3>🧾 Order Details</h3>
+          <h3><i class="fas fa-receipt"></i> Order Details</h3>
           <div class="result-order-grid" id="resultGrid">
             <span class="key">Customer</span><span class="val" id="rCustomer">-</span>
             <span class="key">Product</span><span class="val" id="rProduct">-</span>
@@ -886,11 +887,11 @@ nav {
           </div>
         </div>
         <div class="result-history">
-          <h3>📋 Transaction History</h3>
+          <h3><i class="fas fa-clipboard-list"></i> Transaction History</h3>
           <div class="history-list" id="resultHistoryList"></div>
         </div>
         <div style="text-align:center;">
-          <button class="btn-shop-again" onclick="shopAgain()">🛍️ Shop Again</button>
+          <button class="btn-shop-again" onclick="shopAgain()"><i class="fas fa-bag-shopping"></i> Shop Again</button>
         </div>
       </div>
     </div>
@@ -901,12 +902,12 @@ nav {
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <aside class="cart-drawer" id="cartDrawer">
   <div class="cart-header">
-    <h2>🛒 Shopping Cart</h2>
-    <button class="cart-close" onclick="toggleCart()">✕</button>
+    <h2><i class="fas fa-cart-shopping"></i> Shopping Cart</h2>
+    <button class="cart-close" onclick="toggleCart()"><i class="fas fa-times"></i></button>
   </div>
   <div class="cart-items" id="cartItems">
     <div class="cart-empty">
-      <div class="icon">🛒</div>
+      <div class="icon"><i class="fas fa-cart-shopping"></i></div>
       <div>Your cart is empty</div>
       <div style="font-size:12px;margin-top:4px;">Add some products to get started!</div>
     </div>
@@ -917,7 +918,7 @@ nav {
       <span class="amount" id="cartTotal">Rp 0</span>
     </div>
     <button class="btn-checkout" id="btnCheckout" onclick="proceedToCheckout()">
-      Proceed to Checkout →
+      Proceed to Checkout <i class="fas fa-arrow-right"></i>
     </button>
   </div>
 </aside>
@@ -944,7 +945,7 @@ async function loadProducts() {
   } catch (e) {
     document.getElementById('productGrid').innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted2);">
-        <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+        <div style="font-size:48px;margin-bottom:12px;"><i class="fas fa-exclamation-triangle"></i></div>
         <div>Failed to load products. Make sure the server is running.</div>
       </div>`;
   }
@@ -966,7 +967,7 @@ function renderProducts() {
             <div class="product-rating">${stars} ${p.rating}</div>
           </div>
           <button class="add-btn" onclick="addToCart(${p.id});event.stopPropagation();">
-            🛒 Add to Cart
+            <i class="fas fa-cart-shopping"></i> Add to Cart
           </button>
         </div>
       </div>`;
@@ -984,12 +985,12 @@ function addToCart(productId) {
     cart.push({ ...product, qty: 1 });
   }
   updateCartUI();
-  showToast(`✅ ${product.name} added to cart`);
+  showToast('\u2705 ' + product.name + ' added to cart');
   document.querySelectorAll('.add-btn').forEach((btn, i) => {
     if (i === products.findIndex(p => p.id === productId)) {
-      btn.textContent = '✅ Added';
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Added';
       btn.classList.add('added');
-      setTimeout(() => { btn.textContent = '🛒 Add to Cart'; btn.classList.remove('added'); }, 1500);
+      setTimeout(() => { btn.innerHTML = '<i class="fas fa-cart-shopping"></i> Add to Cart'; btn.classList.remove('added'); }, 1500);
     }
   });
 }
@@ -1018,7 +1019,7 @@ function updateCartUI() {
   if (cart.length === 0) {
     container.innerHTML = `
       <div class="cart-empty">
-        <div class="icon">🛒</div>
+        <div class="icon"><i class="fas fa-cart-shopping"></i></div>
         <div>Your cart is empty</div>
         <div style="font-size:12px;margin-top:4px;">Add some products to get started!</div>
       </div>`;
@@ -1038,7 +1039,7 @@ function updateCartUI() {
           <button onclick="updateQty(${item.id},1)">+</button>
         </div>
       </div>
-      <button class="cart-item-remove" onclick="removeFromCart(${item.id})">✕</button>
+      <button class="cart-item-remove" onclick="removeFromCart(${item.id})"><i class="fas fa-times"></i></button>
     </div>
   `).join('');
   document.getElementById('cartTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
@@ -1125,13 +1126,13 @@ async function placeOrder() {
     });
     if (response.status === 401 || response.status === 403) {
       showView('result');
-      document.getElementById('resultIcon').textContent = '🔑';
+      document.getElementById('resultIcon').innerHTML = '<i class="fas fa-key"></i>';
       document.getElementById('resultTitle').textContent = 'Authentication Required';
       document.getElementById('resultSubtitle').textContent = 'Please login first to place an order.';
       document.getElementById('resultOrderSummary').style.display = 'none';
       document.getElementById('resultHistoryList').innerHTML = '';
       btn.disabled = false;
-      btn.innerHTML = '🔄 Place Order';
+      btn.innerHTML = '<i class="fas fa-sync-alt"></i> Place Order';
       return;
     }
 
@@ -1154,7 +1155,7 @@ async function placeOrder() {
         const isRollback = key.startsWith('rollback');
         if (isRollback) {
           document.getElementById('rollbackPath').classList.add('visible');
-          document.getElementById('processingStatus').textContent = '⚠️ Transaction failed — rolling back...';
+          document.getElementById('processingStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Transaction failed — rolling back...';
           setLoading(targetStep);
           await sleep(400);
           const arrowKey = targetStep === 'step1' ? null : (targetStep === 'step2' ? 'arrow1' : 'arrow2');
@@ -1179,13 +1180,13 @@ async function placeOrder() {
     showResult();
   } catch (err) {
     showView('result');
-    document.getElementById('resultIcon').textContent = '❌';
+    document.getElementById('resultIcon').innerHTML = '<i class="fas fa-times-circle"></i>';
     document.getElementById('resultTitle').textContent = 'Connection Error';
     document.getElementById('resultSubtitle').textContent = err.message || 'Network error — pastikan server berjalan';
     document.getElementById('resultOrderSummary').style.display = 'none';
     document.getElementById('resultHistoryList').innerHTML = '';
     btn.disabled = false;
-    btn.innerHTML = '🔄 Place Order';
+    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Place Order';
   }
 }
 
@@ -1194,7 +1195,7 @@ function resetFlow() {
   ['step1Box', 'step2Box', 'step3Box'].forEach(id => {
     const b = document.getElementById(id);
     b.className = 'step-box idle';
-    b.querySelector('.badge').textContent = '⏳ Waiting';
+    b.querySelector('.badge').innerHTML = '<i class="fas fa-hourglass-half"></i> Waiting';
   });
   document.getElementById('arrow1').className = 'arrow';
   document.getElementById('arrow2').className = 'arrow';
@@ -1205,26 +1206,26 @@ function resetFlow() {
 function setLoading(step) {
   const b = document.getElementById(step + 'Box');
   b.className = 'step-box loading';
-  b.querySelector('.badge').textContent = '⏳ Processing...';
+  b.querySelector('.badge').innerHTML = '<i class="fas fa-hourglass-half"></i> Processing...';
 }
 
 function setStepResult(step, success, isRollback) {
   const b = document.getElementById(step + 'Box');
   if (isRollback) {
     b.className = 'step-box rollback';
-    b.querySelector('.badge').textContent = '↩️ Rollback';
+    b.querySelector('.badge').innerHTML = '<i class="fas fa-undo"></i> Rollback';
   } else if (success) {
     b.className = 'step-box success';
-    b.querySelector('.badge').textContent = '✅ Success';
+    b.querySelector('.badge').innerHTML = '<i class="fas fa-check-circle"></i> Success';
   } else {
     b.className = 'step-box fail';
-    b.querySelector('.badge').textContent = '❌ Failed';
+    b.querySelector('.badge').innerHTML = '<i class="fas fa-times-circle"></i> Failed';
   }
 }
 
 function updateArrow(arrowId, isRollback) {
   const a = document.getElementById(arrowId);
-  if (a) { a.className = `arrow ${isRollback ? 'rollback-active' : 'active'}`; a.textContent = isRollback ? '↩️' : '➡️'; }
+  if (a) { a.className = `arrow ${isRollback ? 'rollback-active' : 'active'}`; a.innerHTML = isRollback ? '<i class="fas fa-undo"></i>' : '<i class="fas fa-arrow-right"></i>'; }
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -1238,7 +1239,7 @@ function showResult() {
   const hasRollback = entries.some(([k]) => k.startsWith('rollback'));
 
   document.getElementById('resultOrderSummary').style.display = 'block';
-  document.getElementById('resultIcon').textContent = hasFailed ? '❌' : '✅';
+  document.getElementById('resultIcon').innerHTML = hasFailed ? '<i class="fas fa-times-circle"></i>' : '<i class="fas fa-check-circle"></i>';
   document.getElementById('resultTitle').textContent = hasFailed ? 'Order Failed' : 'Order Successful!';
 
   if (hasFailed) {
@@ -1261,8 +1262,8 @@ function showResult() {
   entries.forEach(([key, result]) => {
     const isRollback = key.startsWith('rollback');
     const displayName = isRollback
-      ? `↩️ Rollback ${key.replace('rollback', 'Step ')}`
-      : ({ step1: '💳 Step 1 — Payment', step2: '📦 Step 2 — Inventory', step3: '🚚 Step 3 — Shipping' }[key] || key);
+      ? '<i class="fas fa-undo"></i> Rollback ' + key.replace('rollback', 'Step ')
+      : ({ step1: '<i class="fas fa-credit-card"></i> Step 1 &mdash; Payment', step2: '<i class="fas fa-box"></i> Step 2 &mdash; Inventory', step3: '<i class="fas fa-truck"></i> Step 3 &mdash; Shipping' }[key] || key);
     const service = isRollback
       ? ({ rollback1: 'Refund Payment', rollback2: 'Release Inventory', rollback3: 'Cancel Shipping' }[key] || 'Compensation')
       : ({ step1: 'Payment Service', step2: 'Inventory Service', step3: 'Shipping Service' }[key] || '');
@@ -1270,7 +1271,7 @@ function showResult() {
     const tagLabel = isRollback ? 'rollback' : result.success ? 'success' : 'failed';
 
     let payloadHtml = '';
-    if (result.error) payloadHtml = `<pre>⚠️ Error: ${escapeHtml(result.error)}</pre>`;
+    if (result.error) payloadHtml = `<pre><i class="fas fa-exclamation-triangle"></i> Error: ${escapeHtml(result.error)}</pre>`;
     else if (result.data) payloadHtml = `<pre>${escapeHtml(JSON.stringify(result.data, null, 2))}</pre>`;
 
     const div = document.createElement('div');
@@ -1278,13 +1279,13 @@ function showResult() {
     div.innerHTML = `
       <div class="history-header" onclick="this.parentElement.classList.toggle('open')">
         <div class="history-header-left">
-          <span>${isRollback ? '↩️' : result.success ? '✅' : '❌'}</span>
+          <span>${isRollback ? '<i class="fas fa-undo"></i>' : result.success ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>'}</span>
           <div>
             <div class="history-title">${displayName}</div>
             <div class="history-sub">${service} <span class="tag tag-${tag}">${tagLabel}</span></div>
           </div>
         </div>
-        <span class="history-chevron">▼</span>
+        <span class="history-chevron">&#9660;</span>
       </div>
       <div class="history-body">
         <div class="history-body-inner">${payloadHtml || '<span style="color:var(--muted);font-size:12px;">No data</span>'}</div>
