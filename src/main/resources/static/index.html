@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Commerce Saga Orchestration</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    padding: 28px 0 20px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; }
+  .header h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .header p { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Order Form */
+  .order-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .order-panel h2 { font-size: 17px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    transition: border 0.2s;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .total-display {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    margin: 16px 0;
+    border: 1px solid var(--border);
+  }
+  .total-display .label { font-size: 12px; color: var(--muted); }
+  .total-display .amount { font-size: 24px; font-weight: 700; color: var(--primary); }
+
+  .btn-process {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-process:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.35); }
+  .btn-process:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  .fail-toggle {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .fail-toggle button {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .fail-toggle button:hover { border-color: var(--muted); color: var(--text); }
+  .fail-toggle button.active { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.1); }
+  .fail-toggle button.none { border-color: var(--success); }
+  .fail-toggle button.none.active { border-color: var(--success); color: var(--success); background: rgba(34,197,94,0.1); }
+
+  /* Flow */
+  .flow-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    min-height: 200px;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 10px 0 16px;
+    flex-wrap: wrap;
+  }
+  .step-box {
+    width: 170px;
+    padding: 18px 14px;
+    border-radius: 14px;
+    text-align: center;
+    border: 2px solid var(--border);
+    transition: all 0.4s ease;
+    background: var(--bg);
+  }
+  .step-box .icon { font-size: 30px; margin-bottom: 4px; }
+  .step-box .label { font-weight: 700; font-size: 14px; }
+  .step-box .sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .step-box .badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--border);
+    color: var(--muted);
+    transition: all 0.4s ease;
+  }
+  .step-box.idle { border-color: var(--border); }
+  .step-box.loading { border-color: var(--info); animation: pulse 1s infinite; }
+  .step-box.success { border-color: var(--success); background: rgba(34,197,94,0.08); }
+  .step-box.success .badge { background: var(--success); color: #fff; }
+  .step-box.fail { border-color: var(--danger); background: rgba(239,68,68,0.08); }
+  .step-box.fail .badge { background: var(--danger); color: #fff; }
+  .step-box.rollback { border-color: var(--warning); background: rgba(245,158,11,0.08); }
+  .step-box.rollback .badge { background: var(--warning); color: #000; }
+
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 50% { box-shadow: 0 0 0 12px rgba(59,130,246,0); } }
+
+  .arrow {
+    font-size: 24px;
+    color: var(--muted);
+    padding: 0 2px;
+    transition: color 0.4s ease;
+    flex-shrink: 0;
+  }
+  .arrow.active { color: var(--success); }
+  .arrow.rollback-active { color: var(--warning); }
+
+  .rollback-path {
+    text-align: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.2);
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: var(--warning);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .rollback-path.visible { opacity: 1; }
+
+  .order-summary {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .order-summary.visible { display: block; }
+
+  .order-summary h3 { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  .order-summary .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; font-size: 13px; }
+  .order-summary .grid .key { color: var(--muted); }
+  .order-summary .grid .val { font-weight: 500; text-align: right; }
+
+  .result-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  .result-card.visible { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .result-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .result-status.success { background: rgba(34,197,94,0.15); color: var(--success); }
+  .result-status.fail { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .result-msg { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  .result-body { padding: 12px 18px 18px; }
+  .result-body h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--muted); }
+
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: slideIn 0.3s ease both;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .history-header {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg);
+    transition: background 0.2s;
+  }
+  .history-header:hover { background: rgba(99,102,241,0.05); }
+  .history-header-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .history-title { font-weight: 600; font-size: 13px; }
+  .history-sub { font-size: 11px; color: var(--muted); }
+  .history-chevron { font-size: 10px; color: var(--muted); transition: transform 0.3s; }
+  .history-item.open .history-chevron { transform: rotate(180deg); }
+
+  .history-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    border-top: 1px solid transparent;
+  }
+  .history-item.open .history-body { max-height: 600px; border-top-color: var(--border); }
+  .history-body-inner { padding: 10px 14px; }
+  .history-body-inner pre {
+    background: #0a0f1a;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    color: #cbd5e1;
+    line-height: 1.5;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .tag-success { background: rgba(34,197,94,0.2); color: var(--success); }
+  .tag-fail { background: rgba(239,68,68,0.2); color: var(--danger); }
+  .tag-rollback { background: rgba(245,158,11,0.2); color: var(--warning); }
+
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    margin-top: 12px;
+  }
+  .btn-reset:hover { color: var(--text); border-color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🛒 <span>E-Commerce Saga</span> Orchestration</h1>
+    <p>Distributed Transaction &bull; Payment → Inventory → Shipping</p>
+  </div>
+
+  <div class="layout">
+    <div class="order-panel">
+      <h2>📋 Order Form</h2>
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" value="Budi Santoso" placeholder="Nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>Product</label>
+        <select id="product" onchange="updateTotal()">
+          <option value="Sepatu Running" data-price="150000">Sepatu Running — Rp 150.000</option>
+          <option value="Tas Ransel" data-price="200000">Tas Ransel — Rp 200.000</option>
+          <option value="Jam Tangan" data-price="350000">Jam Tangan — Rp 350.000</option>
+          <option value="Headphone" data-price="250000">Headphone — Rp 250.000</option>
+          <option value="Dompet Kulit" data-price="120000">Dompet Kulit — Rp 120.000</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" id="quantity" value="1" min="1" max="99" onchange="updateTotal()">
+        </div>
+        <div class="form-group">
+          <label>Payment</label>
+          <select id="paymentMethod">
+            <option>Bank BCA</option>
+            <option>Bank Mandiri</option>
+            <option>GoPay</option>
+            <option>OVO</option>
+            <option>Dana</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Shipping Address</label>
+        <textarea id="address">Jl. Merdeka No. 10, Jakarta Pusat</textarea>
+      </div>
+
+      <div class="total-display">
+        <div class="label">Total Pembayaran</div>
+        <div class="amount" id="totalAmount">Rp 150.000</div>
+      </div>
+
+      <button class="btn-process" id="btnProcess" onclick="processOrder()">🛒 Process Order</button>
+
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
+        <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;">Simulasi Error (opsional):</div>
+        <div class="fail-toggle" id="failToggle">
+          <button class="none active" data-fail="" onclick="setFail(this)">✅ None</button>
+          <button data-fail="step1" onclick="setFail(this)">💳 Step 1</button>
+          <button data-fail="step2" onclick="setFail(this)">📦 Step 2</button>
+          <button data-fail="step3" onclick="setFail(this)">🚚 Step 3</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-panel">
+      <div class="flow" id="flow">
+        <div class="step-box idle" id="step1Box">
+          <div class="icon">💳</div>
+          <div class="label">Payment</div>
+          <div class="sub">Step 1</div>
+          <div class="badge">⏳ Waiting</div>
+        </div>
+        <div class="arrow" id="arrow1">➡️</div>
+        <div class="step-box idle" id="step2Box">
+          <div class="icon">📦</div>
+          <div class="label">Inventory</div>
+          <div class="sub">Step 2</div>
+          <div class="badge">⏳ Waiting</div>
+        </div>
+        <div class="arrow" id="arrow2">➡️</div>
+        <div class="step-box idle" id="step3Box">
+          <div class="icon">🚚</div>
+          <div class="label">Shipping</div>
+          <div class="sub">Step 3</div>
+          <div class="badge">⏳ Waiting</div>
+        </div>
+      </div>
+
+      <div class="rollback-path" id="rollbackPath">
+        ↩️ Rollback: Membatalkan transaksi secara berurutan
+      </div>
+
+      <div class="order-summary" id="orderSummary">
+        <h3>🧾 Order Summary</h3>
+        <div class="grid">
+          <span class="key">Customer</span><span class="val" id="osCustomer">-</span>
+          <span class="key">Product</span><span class="val" id="osProduct">-</span>
+          <span class="key">Quantity</span><span class="val" id="osQty">-</span>
+          <span class="key">Total</span><span class="val" id="osTotal">-</span>
+          <span class="key">Payment</span><span class="val" id="osPayment">-</span>
+          <span class="key">Address</span><span class="val" id="osAddress">-</span>
+        </div>
+      </div>
+
+      <div class="result-card" id="resultCard">
+        <div class="result-header">
+          <div>
+            <div class="result-status" id="resultStatus">✅ SUCCESS</div>
+            <div class="result-msg" id="resultMsg"></div>
+          </div>
+        </div>
+        <div class="result-body">
+          <h4>📋 Step History</h4>
+          <div class="history-list" id="historyList"></div>
+          <div style="text-align:right;">
+            <button class="btn-reset" onclick="resetAll()">↻ Reset & New Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/orchestration';
+
+const boxes = { step1: document.getElementById('step1Box'), step2: document.getElementById('step2Box'), step3: document.getElementById('step3Box') };
+const arrows = { arrow1: document.getElementById('arrow1'), arrow2: document.getElementById('arrow2') };
+
+function setIdle() {
+  Object.values(boxes).forEach(b => { b.className = 'step-box idle'; b.querySelector('.badge').textContent = '⏳ Waiting'; });
+  arrows.arrow1.className = 'arrow'; arrows.arrow2.className = 'arrow';
+  document.getElementById('rollbackPath').className = 'rollback-path';
+}
+
+function setLoading(step) {
+  const b = boxes[step];
+  b.className = 'step-box loading';
+  b.querySelector('.badge').textContent = '⏳ Processing...';
+}
+
+function setStepResult(step, success, isRollback) {
+  const b = boxes[step];
+  if (isRollback) {
+    b.className = 'step-box rollback';
+    b.querySelector('.badge').textContent = '↩️ Rollback';
+  } else if (success) {
+    b.className = 'step-box success';
+    b.querySelector('.badge').textContent = '✅ Success';
+  } else {
+    b.className = 'step-box fail';
+    b.querySelector('.badge').textContent = '❌ Failed';
+  }
+}
+
+function updateArrow(arrowId, isRollback) {
+  const a = document.getElementById(arrowId);
+  if (a) { a.className = `arrow ${isRollback ? 'rollback-active' : 'active'}`; a.textContent = isRollback ? '↩️' : '➡️'; }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function getOrderData() {
+  const sel = document.getElementById('product');
+  const price = parseInt(sel.options[sel.selectedIndex].dataset.price);
+  const qty = parseInt(document.getElementById('quantity').value) || 1;
+  return {
+    product: sel.value,
+    quantity: qty,
+    price: price,
+    customerName: document.getElementById('customerName').value.trim() || 'Customer',
+    address: document.getElementById('address').value.trim() || 'Jakarta',
+    paymentMethod: document.getElementById('paymentMethod').value
+  };
+}
+
+function updateTotal() {
+  const sel = document.getElementById('product');
+  const price = parseInt(sel.options[sel.selectedIndex].dataset.price);
+  const qty = parseInt(document.getElementById('quantity').value) || 1;
+  document.getElementById('totalAmount').textContent = 'Rp ' + (price * qty).toLocaleString('id-ID');
+}
+
+let selectedFail = '';
+
+function setFail(el) {
+  document.querySelectorAll('#failToggle button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedFail = el.dataset.fail;
+}
+
+async function processOrder() {
+  const btn = document.getElementById('btnProcess');
+  btn.disabled = true;
+  btn.textContent = '⏳ Processing...';
+  setIdle();
+  document.getElementById('orderSummary').classList.remove('visible');
+  document.getElementById('resultCard').classList.remove('visible');
+  document.getElementById('rollbackPath').classList.remove('visible');
+
+  const order = getOrderData();
+  document.getElementById('osCustomer').textContent = order.customerName;
+  document.getElementById('osProduct').textContent = order.product;
+  document.getElementById('osQty').textContent = order.quantity;
+  document.getElementById('osTotal').textContent = 'Rp ' + (order.price * order.quantity).toLocaleString('id-ID');
+  document.getElementById('osPayment').textContent = order.paymentMethod;
+  document.getElementById('osAddress').textContent = order.address;
+  document.getElementById('orderSummary').classList.add('visible');
+
+  try {
+    const url = selectedFail ? `${API}/saga?failAt=${selectedFail}` : `${API}/saga`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    });
+
+    if (!response.ok) {
+      showError(`Server error: ${response.status}`);
+      btn.disabled = false; btn.textContent = '🛒 Process Order';
+      return;
+    }
+
+    const data = await response.json();
+    const history = data.history || {};
+    const entries = Object.entries(history);
+
+    let delay = 0;
+    for (const [key, result] of entries) {
+      let targetStep = null;
+      if (key === 'step1' || key === 'rollback1') targetStep = 'step1';
+      else if (key === 'step2' || key === 'rollback2') targetStep = 'step2';
+      else if (key === 'step3' || key === 'rollback3') targetStep = 'step3';
+
+      if (targetStep) {
+        await sleep(delay);
+        const isRollback = key.startsWith('rollback');
+        if (isRollback) {
+          document.getElementById('rollbackPath').classList.add('visible');
+          setLoading(targetStep);
+          await sleep(400);
+          const arrowKey = targetStep === 'step1' ? null : (targetStep === 'step2' ? 'arrow1' : 'arrow2');
+          if (arrowKey) updateArrow(arrowKey, true);
+          setStepResult(targetStep, result.success, true);
+        } else {
+          setLoading(targetStep);
+          await sleep(500);
+          setStepResult(targetStep, result.success, false);
+          if (result.success && (targetStep === 'step1' || targetStep === 'step2')) {
+            const arrowKey = targetStep === 'step1' ? 'arrow1' : 'arrow2';
+            updateArrow(arrowKey, false);
+          }
+        }
+        delay = 600;
+      }
+    }
+
+    await sleep(300);
+
+    const hasFailed = data.status === 'FAILED';
+    const hasRollback = entries.some(([k]) => k.startsWith('rollback'));
+
+    document.getElementById('resultStatus').className = `result-status ${hasFailed ? 'fail' : 'success'}`;
+    document.getElementById('resultStatus').innerHTML = hasFailed ? '❌ FAILED' : '✅ SUCCESS';
+
+    if (hasFailed) {
+      const stepName = data.failedAt ? `Step ${data.failedAt.replace('STEP', '')}` : 'unknown';
+      const rb = hasRollback ? ' Rollback berhasil dijalankan.' : ' Tidak ada rollback.';
+      document.getElementById('resultMsg').textContent = `Transaksi gagal di ${stepName}.${rb}`;
+    } else {
+      document.getElementById('resultMsg').textContent = 'Transaksi berhasil! Pesanan akan segera diproses.';
+    }
+
+    document.getElementById('historyList').innerHTML = '';
+    entries.forEach(([key, result]) => {
+      const isRollback = key.startsWith('rollback');
+      const displayName = isRollback
+        ? `↩️ Rollback ${key.replace('rollback', 'Step ')}`
+        : ({ step1: '💳 Step 1 — Payment', step2: '📦 Step 2 — Inventory', step3: '🚚 Step 3 — Shipping' }[key] || key);
+      const service = isRollback
+        ? ({ rollback1: 'Refund Payment', rollback2: 'Release Inventory', rollback3: 'Cancel Shipping' }[key] || 'Compensation')
+        : ({ step1: 'Payment Service', step2: 'Inventory Service', step3: 'Shipping Service' }[key] || '');
+      const tag = isRollback ? 'rollback' : result.success ? 'success' : 'fail';
+      const tagLabel = isRollback ? 'rollback' : result.success ? 'success' : 'failed';
+
+      let payloadHtml = '';
+      if (result.error) payloadHtml = `<pre>⚠️ Error: ${escapeHtml(result.error)}</pre>`;
+      else if (result.data) payloadHtml = `<pre>${escapeHtml(JSON.stringify(result.data, null, 2))}</pre>`;
+
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `
+        <div class="history-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="history-header-left">
+            <span>${isRollback ? '↩️' : result.success ? '✅' : '❌'}</span>
+            <div>
+              <div class="history-title">${displayName}</div>
+              <div class="history-sub">${service} <span class="tag tag-${tag}">${tagLabel}</span></div>
+            </div>
+          </div>
+          <span class="history-chevron">▼</span>
+        </div>
+        <div class="history-body">
+          <div class="history-body-inner">${payloadHtml || '<span style="color:var(--muted);font-size:12px;">No data</span>'}</div>
+        </div>
+      `;
+      document.getElementById('historyList').appendChild(div);
+    });
+
+    document.getElementById('resultCard').classList.add('visible');
+
+  } catch (err) {
+    showError(err.message || 'Network error — pastikan server berjalan');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🛒 Process Order';
+}
+
+function showError(msg) {
+  document.getElementById('resultStatus').className = 'result-status fail';
+  document.getElementById('resultStatus').innerHTML = '❌ ERROR';
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('historyList').innerHTML = '';
+  document.getElementById('resultCard').classList.add('visible');
+  setIdle();
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+function resetAll() {
+  setIdle();
+  document.getElementById('orderSummary').classList.remove('visible');
+  document.getElementById('resultCard').classList.remove('visible');
+  document.getElementById('rollbackPath').classList.remove('visible');
+  document.getElementById('historyList').innerHTML = '';
+}
+</script>
+</body>
+</html>
